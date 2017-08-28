@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+	http://www.springframework.org/schema/tx 
+	http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
+	http://www.springframework.org/schema/aop 
+	http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
+	http://www.springframework.org/schema/context 
+	http://www.springframework.org/schema/context/spring-context-2.5.xsd"
+	default-autowire="byName" default-lazy-init="true">
+	<!-- 读取属性文件 -->
+	  <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+	     <property name="location" value="classpath:jdbc.properties"></property>
+	  </bean>
+	
+	<!-- 数据源配置 -->
+	   <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+	        <property name="driverClassName" value="${jdbc.driver}"></property>
+	        <property name="url" value="${jdbc.url}"></property>
+	        <property name="username" value="${jdbc.username}"></property>
+	        <property name="password" value="${jdbc.password}"></property>
+	   </bean>
+	   
+	    <!-- 注解的sessionFactory配置 -->
+	     <bean id="sessionFactory" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+	         <!-- 注入数据源 -->
+	       <property name="dataSource" ref="dataSource"></property>
+	        <!-- 注入属性文件 -->
+	       <property name="hibernateProperties">
+	           <props>
+	             <prop key="hibernate.dialect">org.hibernate.dialect.MySQL5InnoDBDialect</prop>
+	             <prop key="hibernate.show_sql">true</prop>
+	             <prop key="hibernate.format_sql">false</prop>
+	             <prop key="hibernate.lazy">false</prop>
+	             <prop key="hibernate.hbm2ddl.auto">update</prop>
+	           </props>
+	       </property>
+	       <!-- 读取类配置 -->
+	         <property name="annotatedClasses">
+	           <list>
+	            <value>com.hjx.model.User</value>
+	            <value>com.hjx.model.Security</value>
+	            <value>com.hjx.model.ParentFlate</value>
+	            <value>com.hjx.model.Flate</value>
+	            <value>com.hjx.model.Topic</value>
+	            <value>com.hjx.model.Admin</value>
+	            <value>com.hjx.model.Reply</value>
+	           </list>
+	         </property>
+	     </bean>        
+	   <!-- 通过注解驱动事务 -->
+	     <tx:annotation-driven transaction-manager="trans" proxy-target-class="true"/>
+	   <!-- 扫描的包 -->
+	     <context:component-scan base-package="com.hjx" />
+	    
+	     <!-- 声明式事务配置 -->
+	     <bean id="trans" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+	       <property name="sessionFactory" ref="sessionFactory"></property>
+	     </bean>
+	     
+	   
+
+	    
+	</beans>
